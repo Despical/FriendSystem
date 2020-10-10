@@ -5,8 +5,6 @@ import me.despical.friendsystem.commands.exception.CommandException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.List;
-
 /**
  * @author Despical
  * <p>
@@ -14,7 +12,7 @@ import java.util.List;
  */
 public abstract class SubCommand {
 
-	private final Main plugin = JavaPlugin.getPlugin(Main.class);
+	protected final Main plugin = JavaPlugin.getPlugin(Main.class);
 	private final String name;
 	private String permission;
 	private final String[] aliases;
@@ -36,14 +34,6 @@ public abstract class SubCommand {
 		this.permission = permission;
 	}
 
-	public String getPermission() {
-		return permission;
-	}
-
-	public Main getPlugin() {
-		return plugin;
-	}
-
 	public final boolean hasPermission(CommandSender sender) {
 		if (permission == null) return true;
 		return sender.hasPermission(permission);
@@ -55,15 +45,7 @@ public abstract class SubCommand {
 
 	public abstract void execute(CommandSender sender, String label, String[] args) throws CommandException;
 
-	public abstract List<String> getTutorial();
-
-	public abstract CommandType getType();
-
 	public abstract SenderType getSenderType();
-
-	public enum CommandType {
-		PLAYER, BOTH
-	}
 
 	public enum SenderType {
 		PLAYER, BOTH

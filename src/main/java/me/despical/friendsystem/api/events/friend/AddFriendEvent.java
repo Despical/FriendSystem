@@ -5,6 +5,12 @@ import me.despical.friendsystem.user.User;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 
+/**
+ * @author Despical
+ * @since 0.0.1-ALPHA
+ * <p>
+ * Created at 22.09.2020
+ */
 public class AddFriendEvent extends FriendSystemEvent implements Cancellable {
 
 	private final HandlerList HANDLERS = new HandlerList();

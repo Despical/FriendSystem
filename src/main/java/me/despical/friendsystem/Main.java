@@ -1,7 +1,13 @@
 package me.despical.friendsystem;
 
 import me.despical.commonsbox.compat.VersionResolver;
+import me.despical.commonsbox.configuration.ConfigUtils;
+import me.despical.commonsbox.database.MysqlDatabase;
+import me.despical.friendsystem.commands.CommandHandler;
+import me.despical.friendsystem.events.JoinEvent;
+import me.despical.friendsystem.events.QuitEvent;
 import me.despical.friendsystem.handlers.ChatManager;
+import me.despical.friendsystem.handlers.PlaceholderManager;
 import me.despical.friendsystem.user.UserManager;
 import me.despical.friendsystem.utils.Debugger;
 import me.despical.friendsystem.utils.ExceptionLogHandler;
@@ -9,19 +15,21 @@ import me.despical.friendsystem.utils.MessageUtils;
 import me.despical.friendsystem.utils.UpdateChecker;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.logging.Level;
 
 public class Main extends JavaPlugin {
 
 	private ExceptionLogHandler exceptionLogHandler;
 	private boolean forceDisable = false;
+	private ConfigPreferences configPreferences;
+	private MysqlDatabase database;
 	private UserManager userManager;
 	private ChatManager chatManager;
+	private CommandHandler commandHandler;
 
 	@Override
 	public void onEnable() {
@@ -36,30 +44,29 @@ public class Main extends JavaPlugin {
 		Debugger.debug("Initialization start");
 
 		long start = System.currentTimeMillis();
+		configPreferences = new ConfigPreferences(this);
 
 		setupFiles();
 		initializeClasses();
 		checkUpdate();
 
-		Debugger.debug(Level.INFO, "Initialization finished took {0} ms", System.currentTimeMillis() - start);
+		Debugger.debug("Initialization finished took {0} ms", System.currentTimeMillis() - start);
 	}
 
 	private boolean validateIfPluginShouldStart() {
-		if (!VersionResolver.isAllSupported()) {
+		if (VersionResolver.isCurrentLower(VersionResolver.ServerVersion.v1_8_R1)) {
 			MessageUtils.thisVersionIsNotSupported();
-			Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "Your server version is not supported by Friend System!");
-			Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "Sadly, we must shut off. Maybe you consider changing your server version?");
+			Debugger.sendConsoleMessage("&cYour server version is not supported by Friend System!");
+			Debugger.sendConsoleMessage("&cSadly, we must shut off. Maybe you consider changing your server version?");
 			forceDisable = true;
 			getServer().getPluginManager().disablePlugin(this);
 			return false;
-
 		} try {
 			Class.forName("org.spigotmc.SpigotConfig");
-
 		} catch (Exception e) {
 			MessageUtils.thisVersionIsNotSupported();
-			Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "Your server software is not supported by Friend System!");
-			Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "We support only Spigot and Spigot forks only! Shutting off...");
+			Debugger.sendConsoleMessage("&cYour server software is not supported by Friend System!");
+			Debugger.sendConsoleMessage("&cWe support only Spigot and Spigot forks only! Shutting off...");
 			forceDisable = true;
 			getServer().getPluginManager().disablePlugin(this);
 			return false;
@@ -68,17 +75,38 @@ public class Main extends JavaPlugin {
 		return true;
 	}
 
-
 	@Override
 	public void onDisable() {
+		if (forceDisable) {
+			return;
+		}
 
+		Debugger.debug("System disable initialized");
+		long start = System.currentTimeMillis();
+
+		Bukkit.getLogger().removeHandler(exceptionLogHandler);
+
+		if (configPreferences.getOption(ConfigPreferences.Option.DATABASE_ENABLED)) {
+			getMysqlDatabase().shutdownConnPool();
+		}
+
+		Debugger.debug("System disable finished took {0} ms", System.currentTimeMillis() - start);
 	}
 
 	private void initializeClasses() {
 		userManager = new UserManager();
 		chatManager = new ChatManager(this);
+		commandHandler = new CommandHandler(this);
+
+		if (configPreferences.getOption(ConfigPreferences.Option.DATABASE_ENABLED)) {
+			FileConfiguration config = ConfigUtils.getConfig(this, "mysql");
+			database = new MysqlDatabase(config.getString("user"), config.getString("password"), config.getString("address"));
+		}
 
 		registerSoftDependenciesAndServices();
+
+		new JoinEvent(this);
+		new QuitEvent(this);
 	}
 
 	private void registerSoftDependenciesAndServices() {
@@ -89,30 +117,26 @@ public class Main extends JavaPlugin {
 
 		if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
 			Debugger.debug("Hooking into PlaceholderAPI");
-//			new PlaceholderManager().register();
+			new PlaceholderManager().register();
 		}
 
-		Debugger.debug(Level.INFO, "Hooked into soft dependencies took {0} ms", System.currentTimeMillis() - start);
+		Debugger.debug("Hooked into soft dependencies took {0} ms", System.currentTimeMillis() - start);
 	}
 
 	private void startPluginMetrics() {
-		Metrics metrics = new Metrics(this, 0);
+		Metrics metrics = new Metrics(this, 9069);
 
-		metrics.addCustomChart(new Metrics.SimplePie("database_enabled", () -> String.valueOf(getConfig().getBoolean("DatabaseActivated", false))));
+		if (!metrics.isEnabled()) {
+			return;
+		}
+
+		metrics.addCustomChart(new Metrics.SimplePie("database_enabled", () -> String.valueOf(configPreferences.getOption(ConfigPreferences.Option.DATABASE_ENABLED))));
 		metrics.addCustomChart(new Metrics.SimplePie("update_notifier", () -> {
 			if (getConfig().getBoolean("Update-Notifier.Enabled", true)) {
-				if (getConfig().getBoolean("Update-Notifier.Notify-Beta-Versions", true)) {
-					return "Enabled with beta notifier";
-				} else {
-					return "Enabled";
-				}
-			} else {
-				if (getConfig().getBoolean("Update-Notifier.Notify-Beta-Versions", true)) {
-					return "Beta notifier only";
-				} else {
-					return "Disabled";
-				}
+				return getConfig().getBoolean("Update-Notifier.Notify-Beta-Versions", true) ? "Enabled with beta notifier" : "Enabled";
 			}
+
+			return getConfig().getBoolean("Update-Notifier.Notify-Beta-Versions", true) ? "Beta notifier only" : "Disabled";
 		}));
 	}
 
@@ -128,15 +152,15 @@ public class Main extends JavaPlugin {
 
 			if (result.getNewestVersion().contains("b")) {
 				if (getConfig().getBoolean("Update-Notifier.Notify-Beta-Versions", true)) {
-					Bukkit.getConsoleSender().sendMessage("[FriendSystem] Found a new beta version available: v" + result.getNewestVersion());
-					Bukkit.getConsoleSender().sendMessage("[FriendSystem] Download it on SpigotMC:");
+					Debugger.sendConsoleMessage("[FriendSystem] Found a new beta version available: v" + result.getNewestVersion());
+					Debugger.sendConsoleMessage("[FriendSystem] Download it on SpigotMC:");
 				}
 				return;
 			}
 
 			MessageUtils.updateIsHere();
-			Bukkit.getConsoleSender().sendMessage("[FriendSystem] Found a new version available: v" + result.getNewestVersion());
-			Bukkit.getConsoleSender().sendMessage("[FriendSystem] Download it SpigotMC:");
+			Debugger.sendConsoleMessage("[FriendSystem] Found a new version available: v" + result.getNewestVersion());
+			Debugger.sendConsoleMessage("[FriendSystem] Download it SpigotMC:");
 		});
 	}
 
@@ -150,11 +174,23 @@ public class Main extends JavaPlugin {
 		}
 	}
 
+	public ConfigPreferences getConfigPreferences() {
+		return configPreferences;
+	}
+
+	public MysqlDatabase getMysqlDatabase() {
+		return database;
+	}
+
 	public UserManager getUserManager() {
 		return userManager;
 	}
 
 	public ChatManager getChatManager() {
 		return chatManager;
+	}
+
+	public CommandHandler getCommandHandler() {
+		return commandHandler;
 	}
 }

@@ -1,0 +1,62 @@
+#     You can translate Friend System messages here.
+#             Color codes (&) supported.
+#
+#              Use \n to make new line
+#        Some messages like kit and kit items
+#        descriptions don't support new lines
+#   they are wrapped every 40 characters automatically
+#
+#     Some messages support their own placeholders
+#                    like %player%
+
+# Friend System Command Messages
+Commands:
+  Did-You-Mean: "&3Did you mean &b/%command%&3?"
+  No-Player: "&cNo player found with name %name%!"
+  Already-Friend: "&cYou're already friends with this person!"
+  No-Request-For-Ignored: "&cYou can't send friend requests to players that you ignore!"
+  You-Are-Ignored-By-Them: "&cYou can't send friend requests to players who ignored you!"
+  Must-Be-Friend-To-Remove: "&cYou must be friend with %player% to remove them from your friends!"
+  Already-Sent: "&cYou've already sent friend request to %player%!"
+  Not-Accepting-Requests: "&cThe player who you sent friend requests is not accepting requests!"
+  Already-Ignored: "&cYou've already ignored that person!"
+  No-Request-From: "&cThat person hasn't invited you to be friends!"
+  Send-Request: "&a> &eYou sent a friend request to %player%! They have 5 minutes to accept it!"
+  Recieve-Request: "&a> &e%player% sent you a friend request you have 5 minutes to accept it!"
+  Accept-Request: "&a> &eYou accepted %player%'s friend request!"
+  Your-Request-Accepted: "&a> &e%player% has accepted your friend request!"
+  Deny-Request: "&a> &eYou declined %player%'s friend request!"
+  Your-Request-Denied: "&c%player% denied your request!"
+  Time-Expired-To-Accept: "&c%player%'s friend request is expired!"
+  Reload-Configuration: "&a> You've successfully reloaded configuration!"
+  Request-Expired: "&a> &eYour friend request to %player% has expired."
+  Toggle-Requests: "&a> &e%requests% friend requests!"
+  Notifications: "&a> &e%notifications% friend join/leave notifications!"
+  Removed-Player: "&a> &eYou removed &7%player%&e from your friends list!"
+  Player-Ignored: "&a> &eYou've successfully ignored %player%!"
+  List-Command:
+    No-Friends: "&eYou don't have any friends yet! Add some with friend add player"
+    Header: "&9-----------------------------------------------------"
+    Page: "&6Friends (Page %page% of %pages%)"
+    Online: "&7%player% &ais currently online"
+    Offline: "&7%player% &cis currently offline"
+    Footer: "&9-----------------------------------------------------"
+  Help-Command:
+    Header: "&9-----------------------------------------------------"
+    Description: "&aFriend commands:\n
+    &e/%cmd% accept Player &7- &bAccept a friend request\n
+    &e/%cmd% add Player &7- &bAdd a player as a friend\n
+    &e/%cmd% deny Player &7- &bDecline a friend request\n
+    &e/%cmd% help &7- &bPrints all available friend commands\n
+    &e/%cmd% list (page) &7- &bList your friends\n
+    &e/%cmd% notifications &7- &bToggle friend join/leave notifications\n
+    &e/%cmd% remove Player &7- &bRemove a player from your friends\n
+    &e/%cmd% requests (page) &7- &bView friend requests\n
+    &e/%cmd% toggle &7- &bToggle friend requests\n"
+    Admin-Bonus-Description: "&e/%cmd% reload &7- &bReload the configuration"
+    Footer: "&9-----------------------------------------------------"
+
+# Notification messages for friends
+Friend-Messages:
+  Join-Notification: "&a> &e%player% has joined!"
+  Leave-Notification: "&a> &e%player% has left!"

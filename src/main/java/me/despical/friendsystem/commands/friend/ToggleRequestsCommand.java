@@ -1,14 +1,15 @@
 package me.despical.friendsystem.commands.friend;
 
 import me.despical.friendsystem.commands.SubCommand;
-import me.despical.friendsystem.commands.exception.CommandException;
 import me.despical.friendsystem.user.User;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Collections;
-import java.util.List;
-
+/**
+ * @author Despical
+ * <p>
+ * Created at 22.09.2020
+ */
 public class ToggleRequestsCommand extends SubCommand {
 
 	public ToggleRequestsCommand() {
@@ -26,22 +27,13 @@ public class ToggleRequestsCommand extends SubCommand {
 	}
 
 	@Override
-	public void execute(CommandSender sender, String label, String[] args) throws CommandException {
-		User user = getPlugin().getUserManager().getUser((Player) sender);
+	public void execute(CommandSender sender, String label, String[] args) {
+		User user = plugin.getUserManager().getUser((Player) sender);
+		String requests = user.isAcceptingRequests() ? "Enabled" : "Disabled";
 
 		user.toggleRequests();
 
-		getPlugin().getChatManager().colorMessage("");
-	}
-
-	@Override
-	public List<String> getTutorial() {
-		return Collections.singletonList("Toggles friend requests");
-	}
-
-	@Override
-	public CommandType getType() {
-		return CommandType.BOTH;
+		sender.sendMessage(plugin.getChatManager().colorMessage("Commands.Toggle-Requests").replace("%requests%", requests));
 	}
 
 	@Override

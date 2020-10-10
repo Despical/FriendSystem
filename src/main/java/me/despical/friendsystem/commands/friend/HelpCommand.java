@@ -1,12 +1,14 @@
 package me.despical.friendsystem.commands.friend;
 
 import me.despical.friendsystem.commands.SubCommand;
-import me.despical.friendsystem.commands.exception.CommandException;
+import me.despical.friendsystem.handlers.ChatManager;
 import org.bukkit.command.CommandSender;
 
-import java.util.Collections;
-import java.util.List;
-
+/**
+ * @author Despical
+ * <p>
+ * Created at 22.09.2020
+ */
 public class HelpCommand extends SubCommand {
 
 	public HelpCommand() {
@@ -24,18 +26,17 @@ public class HelpCommand extends SubCommand {
 	}
 
 	@Override
-	public void execute(CommandSender sender, String label, String[] args) throws CommandException {
+	public void execute(CommandSender sender, String label, String[] args) {
+		ChatManager chatManager = plugin.getChatManager();
 
-	}
+		sender.sendMessage(chatManager.colorMessage("Commands.Help-Command.Header"));
+		sender.sendMessage(chatManager.colorMessage("Commands.Help-Command.Description").replace("%cmd%", label));
 
-	@Override
-	public List<String> getTutorial() {
-		return Collections.singletonList("Prints all available friend commands");
-	}
+		if (sender.hasPermission("friendsystem.admin")) {
+			sender.sendMessage(chatManager.colorMessage("Commands.Help-Command.Admin-Bonus-Description").replace("%cmd%", label));
+		}
 
-	@Override
-	public CommandType getType() {
-		return CommandType.BOTH;
+		sender.sendMessage(chatManager.colorMessage("Commands.Help-Command.Footer"));
 	}
 
 	@Override

@@ -6,8 +6,12 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
+/**
+ * @author Despical
+ * <p>
+ * Created at 22.09.2020
+ */
 public class UserManager {
 
 	private final List<User> users;
@@ -15,11 +19,7 @@ public class UserManager {
 	public UserManager() {
 		this.users = new ArrayList<>();
 
-		this.loadFriendsForOnlinePlayers();
-	}
-
-	private void loadFriendsForOnlinePlayers() {
-		Bukkit.getOnlinePlayers().forEach(player -> getUser(player).loadFriends());
+		Bukkit.getServer().getOnlinePlayers().forEach(this::getUser);
 	}
 
 	public User getUser(Player player) {
@@ -32,8 +32,7 @@ public class UserManager {
 		User user = new User(player);
 		users.add(user);
 
-		Debugger.debug(Level.INFO, "Registered new user {0} ({1})", player.getUniqueId(), player.getName());
-
+		Debugger.debug("Registered new user {0} ({1})", player.getUniqueId(), player.getName());
 		return user;
 	}
 

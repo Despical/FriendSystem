@@ -4,6 +4,11 @@ import me.despical.friendsystem.user.User;
 
 import java.util.List;
 
+/**
+ * @author Despical
+ * <p>
+ * Created at 22.09.2020
+ */
 public interface Database {
 
 	void addFriend(User friend);
@@ -19,8 +24,6 @@ public interface Database {
 	void toggleNotifications();
 
 	List<String> getRequests();
-
-//	List<User> getActiveFriends();
 
 	boolean isFriendWith(User user);
 

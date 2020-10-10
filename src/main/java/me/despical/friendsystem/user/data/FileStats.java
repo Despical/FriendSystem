@@ -7,6 +7,11 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.List;
 
+/**
+ * @author Despical
+ * <p>
+ * Created at 22.09.2020
+ */
 public class FileStats implements Database {
 
 	private final Main plugin;
@@ -18,8 +23,6 @@ public class FileStats implements Database {
 		this.user = user;
 		this.config = ConfigUtils.getConfig(plugin, "friends");
 	}
-
-	// TODO: implement messages
 
 	@Override
 	public void addFriend(User friend) {

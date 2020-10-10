@@ -1,0 +1,11 @@
+name: FriendSystem
+main: me.despical.friendsystem.Main
+author: Despical
+version: ${project.version}
+api-version: 1.13
+softdepend: [PlaceholderAPI]
+
+commands:
+  Friends:
+    description: Friend System commands
+    aliases: [friendsystem, friend, f]

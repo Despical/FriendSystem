@@ -4,6 +4,12 @@ import me.despical.friendsystem.api.events.FriendSystemEvent;
 import me.despical.friendsystem.user.User;
 import org.bukkit.event.HandlerList;
 
+/**
+ * @author Despical
+ * @since 0.0.1-ALPHA
+ * <p>
+ * Created at 22.09.2020
+ */
 public class RemoveFriendEvent extends FriendSystemEvent {
 
 	private final HandlerList HANDLERS = new HandlerList();

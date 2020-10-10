@@ -42,12 +42,12 @@ public class ExceptionLogHandler extends Handler {
 		}
 
 		if (throwable.getCause() != null && throwable.getCause().getStackTrace() != null) {
-			if (!throwable.getCause().getStackTrace()[0].getClassName().contains("me.despical.friendsytem")) {
+			if (!throwable.getCause().getStackTrace()[0].getClassName().contains("me.despical.friendsystem")) {
 				return;
 			}
 		}
 
-		if (!throwable.getStackTrace()[0].getClassName().contains("me.despical.friendsytem")) {
+		if (!throwable.getStackTrace()[0].getClassName().contains("me.despical.friendsystem")) {
 			return;
 		}
 
@@ -66,20 +66,18 @@ public class ExceptionLogHandler extends Handler {
 
 		stacktrace.append("\n");
 
-		for (StackTraceElement str : exception.getStackTrace()) {
-			stacktrace.append(str.toString()).append("\n");
-		}
+		Arrays.stream(exception.getStackTrace()).forEach(str -> stacktrace.append(str.toString()).append("\n"));
 
 		plugin.getLogger().log(Level.WARNING, "[Reporter service] <<-----------------------------[START]----------------------------->>");
 		plugin.getLogger().log(Level.WARNING, stacktrace.toString());
 		plugin.getLogger().log(Level.WARNING, "[Reporter service] <<------------------------------[END]------------------------------>>");
 
-		record.setMessage("[Friend System] We have found a bug in the code. Contact us at our official discord server (Invite link: https://discordapp.com/invite/Vhyy4HA) with the following error given above!");
+		record.setMessage("[FriendSystem] We have found a bug in the code. Contact us at our official discord server (Invite link: https://discordapp.com/invite/Vhyy4HA) with the following error given above!");
 	}
 
 	private boolean containsBlacklistedClass(Throwable throwable) {
 		for (StackTraceElement element : throwable.getStackTrace()) {
-			for (String blacklist : Arrays.asList("me.despical.friendsytem.user.data.MysqlManager", "me.despical.friendsytem.commonsbox.database.MysqlDatabase")) {
+			for (String blacklist : Arrays.asList("me.despical.friendsystem.user.data.MysqlManager", "me.despical.friendsystem.commonsbox.database.MysqlDatabase")) {
 				if (element.getClassName().contains(blacklist)) {
 					return true;
 				}

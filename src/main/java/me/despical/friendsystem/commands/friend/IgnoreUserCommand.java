@@ -1,15 +1,17 @@
 package me.despical.friendsystem.commands.friend;
 
 import me.despical.friendsystem.commands.SubCommand;
-import me.despical.friendsystem.commands.exception.CommandException;
+import me.despical.friendsystem.handlers.ChatManager;
 import me.despical.friendsystem.user.User;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Collections;
-import java.util.List;
-
+/**
+ * @author Despical
+ * <p>
+ * Created at 22.09.2020
+ */
 public class IgnoreUserCommand extends SubCommand {
 
 	public IgnoreUserCommand() {
@@ -27,34 +29,25 @@ public class IgnoreUserCommand extends SubCommand {
 	}
 
 	@Override
-	public void execute(CommandSender sender, String label, String[] args) throws CommandException {
-		User user = getPlugin().getUserManager().getUser((Player) sender);
+	public void execute(CommandSender sender, String label, String[] args) {
+		ChatManager chatManager = plugin.getChatManager();
+		User user = plugin.getUserManager().getUser((Player) sender);
 
 		if (Bukkit.getPlayerExact(args[0]) == null) {
-			getPlugin().getChatManager().colorMessage("");
+			sender.sendMessage(chatManager.colorMessage("Commands.No-Player").replace("%name%", args[0]));
 			return;
 		}
 
-		User friend = getPlugin().getUserManager().getUser(Bukkit.getPlayerExact(args[0]));
+		User friend = plugin.getUserManager().getUser(Bukkit.getPlayerExact(args[0]));
 
-		if (user.isFriendWith(friend)) {
-			getPlugin().getChatManager().colorMessage("");
+		if (user.isIgnored(friend)) {
+			sender.sendMessage(chatManager.colorMessage("Commands.Already-Ignored"));
 			return;
 		}
 
 		user.removeFriend(friend, true);
 
-		getPlugin().getChatManager().colorMessage("");
-	}
-
-	@Override
-	public List<String> getTutorial() {
-		return Collections.singletonList("Ignore the specified player");
-	}
-
-	@Override
-	public CommandType getType() {
-		return CommandType.BOTH;
+		sender.sendMessage(chatManager.colorMessage("Commands.Player-Ignored").replace("%player%", args[0]));
 	}
 
 	@Override

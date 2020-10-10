@@ -6,7 +6,6 @@ import me.despical.friendsystem.api.events.friend.RemoveFriendEvent;
 import me.despical.friendsystem.user.data.Database;
 import me.despical.friendsystem.user.data.FileStats;
 import me.despical.friendsystem.user.data.MysqlManager;
-import me.despical.friendsystem.user.option.Preferences;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -14,28 +13,27 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Despical
+ * <p>
+ * Created at 22.09.2020
+ */
 public class User {
 
 	private final Player player;
-	private final Preferences preferences;
 	private final Main plugin;
 	private final List<User> friends;
 	private final Database database;
 
 	public User(Player player) {
 		this.player = player;
-		this.preferences = new Preferences(this);
 		this.plugin = JavaPlugin.getPlugin(Main.class);
 		this.friends = new ArrayList<>();
-		this.database = plugin.getConfig().getBoolean("DatabaseActivated", false) ? new MysqlManager(plugin) : new FileStats(plugin, this);
+		this.database = plugin.getConfig().getBoolean("DatabaseActivated", false) ? new MysqlManager(plugin, this) : new FileStats(plugin, this);
 	}
 
 	public Player getPlayer() {
 		return player;
-	}
-
-	public Preferences getPreferences() {
-		return preferences;
 	}
 
 	public List<User> getFriends() {
